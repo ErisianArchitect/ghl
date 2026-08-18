@@ -84,16 +84,39 @@ impl Config {
 
 #[derive(Debug, Parser)]
 struct Cmd {
-    #[arg(short, long)]
+    #[arg(
+        short,
+        long,
+        help = "The username of the account that you want to produce a link for.",
+    )]
     user: Option<String>,
-    #[arg(short, long)]
+    #[arg(
+        short,
+        long,
+        help = "The format string to use for your links. Use `{}` for the replacement token, and `{{` and `}}` to escape braces.",
+    )]
     format: Option<String>,
-    #[arg(short, long="no-format")]
+    #[arg(
+        short,
+        long="no-format",
+        help = "Do not format the link.",
+    )]
     no_format: bool,
-    #[arg(short, long)]
+    #[arg(
+        short,
+        long,
+        help = "Copy the result.",
+    )]
     copy: bool,
-    #[arg(short, long)]
+    #[arg(
+        short,
+        long,
+        help = "Produce .git links.",
+    )]
     git: bool,
+    #[arg(
+        help = "Zero or more repositories that you would like to produce links for. Leave empty to just write the user link.",
+    )]
     repo: Vec<String>,
 }
 
@@ -199,11 +222,13 @@ fn map_format(format: String) -> String {
     }
 }
 
+// 
+
 fn main() -> Result<()> {
     // let mut clip = arboard::Clipboard::new().unwrap();
     let cmd = Cmd::parse();
     let config = Config::load(true)?;
-    let format = cmd.format.unwrap_or(config.format);
+    let format = map_format(cmd.format.unwrap_or(config.format));
     let username = config.username;
     let writer = if cmd.copy {
         |text: &str| {
